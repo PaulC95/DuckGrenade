@@ -10,7 +10,7 @@ ENT.Model = Model("models/mld/duck.mdl")
 --Change these values to modify damage proporties
 ENT.ExplosionDamage = 0
 ENT.ExplosionRadius = 0
-ENT.TurtleCount 	= 6
+ENT.TurtleCount 	= 10
 
 
 TurtleNPCClass 		= "npc_headcrab_fast"
@@ -29,7 +29,13 @@ function ENT:Initialize()
    self.BaseClass.Initialize(self)
    
 	local phys = self:GetPhysicsObject()
-	if phys:IsValid() then phys:SetMass(350) end
+	
+	self.Entity:SetModelScale( self.Entity:GetModelScale()*2,0)
+	self.Entity:Activate()
+	if phys:IsValid() then 
+		
+		phys:SetMass(350) 
+	end
 end
 
 function ENT:Explode(tr)
@@ -86,7 +92,7 @@ function ENT:Explode(tr)
 			turtle:SetPos(spos)
 			turtle:SetAngles(Angle(0,270,0))
 			turtle:SetParent(headturtle)
-			turtle:SetModelScale( self.Entity:GetModelScale()*2,0)
+			turtle:SetModelScale( self.Entity:GetModelScale()*1,0)
 
 			--headturtle:SetCollisionGroup(COLLISION_GROUP_WEAPON)
 			
@@ -215,7 +221,10 @@ function TurtleNadeDamage(victim, dmg)
 			turtle:SetModel("models/mld/duck.mdl")
 			turtle:SetPos(victim:GetPos())
 			turtle:SetAngles(victim:GetAngles() + Angle(0,-90,0))
-			turtle:SetColor(Color(128,128,128,255))
+			turtle:SetColor(Color(160,160,160,255))
+			turtle:PhysicsInit( SOLID_VPHYSICS )
+			turtle:SetMoveType(  MOVETYPE_VPHYSICS )   
+			turtle:SetSolid( SOLID_VPHYSICS )
 			turtle:SetModelScale( turtle:GetModelScale()*2,0)
 			//turtle:SetCollisionGroup(COLLISION_GROUP_NONE)
 			turtle:Spawn()
@@ -227,7 +236,9 @@ function TurtleNadeDamage(victim, dmg)
 			victim:SetNoDraw(false)
 			victim:SetColor(Color(255,2555,255,1))
 			--victim:SetRenderMode(RENDER_TRANSALPHA)
-			
+			phys:SetMass(20)
+			phys:Sleep()
+
 			victim:Remove()
 		end
 		if dmg:GetDamageType() == DMG_DROWN then
@@ -238,14 +249,22 @@ function TurtleNadeDamage(victim, dmg)
 			turtle:SetModel("models/mld/duck.mdl")
 			turtle:SetPos(victim:GetPos())
 			turtle:SetAngles(victim:GetAngles() + Angle(0,-90,0))
-			turtle:SetColor(Color(128,128,128,255))
+			turtle:SetColor(Color(160,160,160,255))
+			turtle:PhysicsInit( SOLID_VPHYSICS )
+			turtle:SetMoveType(  MOVETYPE_VPHYSICS )   
+			turtle:SetSolid( SOLID_VPHYSICS )
 			turtle:SetModelScale( turtle:GetModelScale()*2,0)
 			//turtle:SetCollisionGroup(COLLISION_GROUP_NONE)
+			
 			turtle:Spawn()
 			turtle:Activate()
 			
 			local phys = turtle:GetPhysicsObject()
 			if !(phys && IsValid(phys)) then turtle:Remove() end
+			
+			
+			phys:SetMass(20)
+			phys:Sleep()
 			
 			victim:Remove()
 		end

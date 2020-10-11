@@ -4,6 +4,8 @@ if SERVER then
    AddCSLuaFile( "shared.lua" )
 end
 
+SWEP.detonate_timer        = 2
+
 SWEP.Base				= "weapon_tttbasegrenade"
 
 SWEP.Kind = WEAPON_EQUIP2
@@ -18,7 +20,7 @@ SWEP.AllowDrop = true
 SWEP.IsSilent = false
 SWEP.NoSights = true
 
-SWEP.ViewModel			= "models/mld/duck.mdl"
+SWEP.ViewModel			= "models/weapons/v_eq_flashbang.mdl"
 SWEP.WorldModel			= "models/mld/duck.mdl"
 SWEP.Weight				= 5
 SWEP.AutoSpawnable      = false
@@ -38,6 +40,7 @@ if CLIENT then
 		type = "Weapon",
 		desc = "Quack Quack, Motherducker"
    };
+
     function SWEP:DrawWorldModel()
 		--self:DrawModel()
 		local ply = self.Owner
@@ -57,8 +60,8 @@ if CLIENT then
 			self.ModelEntity:SetNoDraw(true)
 		end
 		
-		self.ModelEntity:SetModelScale(1,0)
-		self.ModelEntity:SetPos(pos)
+		self.ModelEntity:SetModelScale(2,0)
+		self.ModelEntity:SetPos(pos + Vector(0,0,0))
 		self.ModelEntity:SetAngles(ang+Angle(0,0,180))
 		self.ModelEntity:DrawModel()
 	end
@@ -77,8 +80,8 @@ if CLIENT then
 				self.ModelEntity:SetNoDraw(true)
 			end
 			
-			self.ModelEntity:SetModelScale(0.5,0)
-			self.ModelEntity:SetPos(pos-ang1:Forward()*1.25-ang1:Up()*1.25+2.3*ang1:Right())
+			self.ModelEntity:SetModelScale(1,0)
+			self.ModelEntity:SetPos(pos-ang1:Forward()*1.25-ang1:Up()*1.25+2.3*ang1:Right() + Vector(0,0,0))
 			self.ModelEntity:SetAngles(ang1)
 			self.ModelEntity:DrawModel()
 		end
