@@ -16,6 +16,7 @@ ENT.TurtleCount 	= 10
 TurtleNPCClass 		= "npc_headcrab_fast"
 TurtleInnocentDamage  = 10
 TurtleTraitorDamage   = 5
+FireDucks = False
 
 AccessorFunc( ENT, "radius", "Radius", FORCE_NUMBER )
 AccessorFunc( ENT, "dmg", "Dmg", FORCE_NUMBER )
@@ -32,6 +33,14 @@ function ENT:Initialize()
 	
 	self.Entity:SetModelScale( self.Entity:GetModelScale()*2,0)
 	self.Entity:Activate()
+	if SERVER then 
+	thrower = self:GetThrower()
+	if thrower:IsOnFire() then 
+		FireDucks = true
+		self.Entity:Ignite(1000,0)
+	end 
+end
+
 	if phys:IsValid() then 
 		
 		phys:SetMass(350) 
@@ -93,6 +102,7 @@ function ENT:Explode(tr)
 			turtle:SetAngles(Angle(0,270,0))
 			turtle:SetParent(headturtle)
 			turtle:SetModelScale( self.Entity:GetModelScale()*1,0)
+			if self.Entity:IsOnFire() then turtle:Ignite(1000) end
 
 			--headturtle:SetCollisionGroup(COLLISION_GROUP_WEAPON)
 			
@@ -158,6 +168,14 @@ function SpawnNPC( Player, Position, Class )
 		NPC:SetModel( NPCData.Model )
 	end
 	
+	-- Damagefilter 
+	--
+	local filter = ents.Create("filter_damage_type")
+	
+	filter:SetKeyValue("damagetype", bit.bor(8,268435456))
+	filter:Spawn()
+   	filter:Activate()
+
 	--
 	-- Spawn Flags
 	--
@@ -165,6 +183,7 @@ function SpawnNPC( Player, Position, Class )
 	if ( NPCData.SpawnFlags ) then SpawnFlags = bit.bor( SpawnFlags, NPCData.SpawnFlags ) end
 	if ( NPCData.TotalSpawnFlags ) then SpawnFlags = NPCData.TotalSpawnFlags end
 	NPC:SetKeyValue( "spawnflags", SpawnFlags )
+	NPC:SetKeyValue( "damagefilter", "filter" )
 	
 	--
 	-- Optional Key Values
@@ -200,13 +219,15 @@ if SERVER and GetConVarString("gamemode") == "terrortown" then
 function TurtleNadeDamage(victim, dmg)
 	local attacker = dmg:GetAttacker()
 	
-	
+	if dmg:GetDamageType() == 8 && victim:GetClass() == TurtleNPCClass then return true end
 	if attacker:IsValid() and attacker:IsNPC() and attacker:GetClass() == TurtleNPCClass then
 		if victim:IsTraitor() == false  then
 			dmg:SetAttacker(attacker:GetNWEntity("Thrower"))
 			dmg:SetDamage(TurtleInnocentDamage)
+			if attacker:GetChildren()[1]:IsOnFire() then victim:Ignite(10,1) end
 		else
 			dmg:SetDamage(TurtleTraitorDamage)
+			if attacker:GetChildren()[1]:IsOnFire() then victim:Ignite(5,1) end
 		end
 		attacker:EmitSound(Quack)
 	end
